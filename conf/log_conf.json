@@ -1,0 +1,8 @@
+{
+  "level": "debug",
+  "encoding": "json",
+  "outputPaths": ["stdout","./test.log"],
+  "errorOutputPaths": ["stderr","./err.log"],
+  "development":false,
+  "encoding":"json"
+}
