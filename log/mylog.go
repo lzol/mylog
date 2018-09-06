@@ -2,8 +2,9 @@ package log
 
 import (
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -17,48 +18,36 @@ var Debug func(msg string, fields ...zapcore.Field)
 var Warn func(msg string, fields ...zapcore.Field)
 var Error func(msg string, fields ...zapcore.Field)
 var Fatal func(msg string, fields ...zapcore.Field)
+var Panic func(msg string, fields ...zapcore.Field)
 
-func InitLogger() {
-	// 日志地址 "out.log" 自定义
-	lp := "/Volumes/Share/GOPATH/src/mylog/test.log"
-	// 日志级别 DEBUG,ERROR, INFO
-	lv := "DEBUG"
-	// 是否 DEBUG
+func InitLogger(file string) {
 
-	initLogger(lp, lv, true)
+	initLog(file)
 	log.SetFlags(log.Lmicroseconds | log.Lshortfile | log.LstdFlags)
 	Info = logger.Info
 	Debug = logger.Debug
 	Warn = logger.Warn
 	Error = logger.Error
 	Fatal = logger.Fatal
+	Panic = logger.Panic
 }
 
-func initLogger(lp string, lv string, isDebug bool) {
-	var js string
-	if isDebug {
-		js = fmt.Sprintf(`{
-      "level": "%s",
-      "encoding": "json",
-      "outputPaths": ["stdout"],
-      "errorOutputPaths": ["stdout"]
-      }`, lv)
-	} else {
-		js = fmt.Sprintf(`{
-      "level": "%s",
-      "encoding": "json",
-      "outputPaths": ["%s"],
-      "errorOutputPaths": ["%s"]
-      }`, lv, lp, lp)
+func initLog(file string) {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatal("read log config file failed!")
 	}
-
+	defer f.Close()
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Fatal("read log config file failed!")
+	}
 	var cfg zap.Config
-	if err := json.Unmarshal([]byte(js), &cfg); err != nil {
+	if err := json.Unmarshal(b, &cfg); err != nil {
 		panic(err)
 	}
 	cfg.EncoderConfig = zap.NewProductionEncoderConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	var err error
 	logger, err = cfg.Build()
 	if err != nil {
 		log.Fatal("init logger error: ", err)
