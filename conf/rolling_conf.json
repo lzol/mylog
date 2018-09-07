@@ -1,0 +1,12 @@
+{
+  "log_path":"./",
+  "file_name":"rolling",
+  "max_remain":3,
+  "rolling_ploicy":2,
+  "rolling_volume_size":"10M",
+  "rolling_time_pattern":"* * * * * *",
+  "compress":true,
+  "asynchronous":false,
+  "lock":true
+
+}

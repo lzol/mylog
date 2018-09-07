@@ -2,7 +2,7 @@
   "level": "debug",
   "encoding": "json",
   "outputPaths": ["stdout","./test.log"],
-  "errorOutputPaths": ["stderr","./err.log"],
+  "errorOutputPaths": ["stdout"],
   "development":false,
   "encoding":"json"
 }
