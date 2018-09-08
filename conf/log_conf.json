@@ -1,8 +1,16 @@
 {
-  "level": "debug",
+  "level": "info",
   "encoding": "json",
-  "outputPaths": ["stdout","./test.log"],
+  "outputPaths": ["stdout"],
   "errorOutputPaths": ["stdout"],
-  "development":false,
-  "encoding":"json"
+  "development":true,
+  "log_path":"./",
+  "file_name":"test",
+  "max_remain":10,
+  "rolling_ploicy":2,
+  "rolling_volume_size":"10M",
+  "rolling_time_pattern":"* * * * * *",
+  "compress":true,
+  "asynchronous":false,
+  "lock":true
 }
