@@ -13,22 +13,22 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
+var Log *zap.Logger
 
 //函数指针，指向Logger.Debug
-var Info func(msg string, fields ...zapcore.Field)
-var Debug func(msg string, fields ...zapcore.Field)
-var Warn func(msg string, fields ...zapcore.Field)
-var Error func(msg string, fields ...zapcore.Field)
+//var Info func(msg string, fields ...zapcore.Field)
+//var Debug func(msg string, fields ...zapcore.Field)
+//var Warn func(msg string, fields ...zapcore.Field)
+//var Error func(msg string, fields ...zapcore.Field)
 
 //Fatal和Panic打印日志后会退出程序，慎用
-var Fatal func(msg string, fields ...zapcore.Field)
-var Panic func(msg string, fields ...zapcore.Field)
+//var Fatal func(msg string, fields ...zapcore.Field)
+//var Panic func(msg string, fields ...zapcore.Field)
 
 func InitLogger(file string) {
 	cfg := initLog(file)
 
-	logger, _ = cfg.Build()
+	Log, _ = cfg.Build()
 
 	var encoder zapcore.Encoder
 
@@ -43,17 +43,11 @@ func InitLogger(file string) {
 		zapcore.Lock(zapcore.AddSync(rollingWriter)),
 		cfg.Level,
 	)
-	core := zapcore.NewTee(logger.Core(), rollingCore)
-	logger = zap.New(core, zap.AddCaller(),
+	core := zapcore.NewTee(Log.Core(), rollingCore)
+	Log = zap.New(core, zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel))
-	defer logger.Sync()
+	defer Log.Sync()
 
-	Info = logger.Info
-	Debug = logger.Debug
-	Warn = logger.Warn
-	Error = logger.Error
-	Fatal = logger.Fatal
-	Panic = logger.Panic
 }
 
 func initLog(file string) zap.Config {
@@ -72,9 +66,9 @@ func initLog(file string) zap.Config {
 	}
 	cfg.EncoderConfig = zap.NewProductionEncoderConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	//logger, err = cfg.Build()
+	//Log, err = cfg.Build()
 	if err != nil {
-		log.Fatal("init logger error: ", err)
+		log.Fatal("init Log error: ", err)
 	}
 	return cfg
 }
