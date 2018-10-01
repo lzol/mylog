@@ -3,17 +3,16 @@ package log
 import (
 	"encoding/json"
 	"github.com/arthurkiller/rollingWriter"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
-	"strings"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"io"
+	"io/ioutil"
+	Log "log"
+	"os"
+	"strings"
 )
 
-var Log *zap.Logger
+var log *zap.Logger
 
 //函数指针，指向Logger.Debug
 //var Info func(msg string, fields ...zapcore.Field)
@@ -28,7 +27,7 @@ var Log *zap.Logger
 func InitLogger(file string) {
 	cfg := initLog(file)
 
-	Log, _ = cfg.Build()
+	log, _ = cfg.Build()
 
 	var encoder zapcore.Encoder
 
@@ -43,22 +42,22 @@ func InitLogger(file string) {
 		zapcore.Lock(zapcore.AddSync(rollingWriter)),
 		cfg.Level,
 	)
-	core := zapcore.NewTee(Log.Core(), rollingCore)
-	Log = zap.New(core, zap.AddCaller(),
+	core := zapcore.NewTee(log.Core(), rollingCore)
+	log = zap.New(core, zap.AddCaller(),
 		zap.AddStacktrace(zapcore.ErrorLevel))
-	defer Log.Sync()
+	defer log.Sync()
 
 }
 
 func initLog(file string) zap.Config {
 	f, err := os.Open(file)
 	if err != nil {
-		log.Fatal("read log config file failed!")
+		Log.Fatal("read log config file failed!")
 	}
 	defer f.Close()
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
-		log.Fatal("read log config file failed!")
+		Log.Fatal("read log config file failed!")
 	}
 	var cfg zap.Config
 	if err := json.Unmarshal(b, &cfg); err != nil {
@@ -66,9 +65,9 @@ func initLog(file string) zap.Config {
 	}
 	cfg.EncoderConfig = zap.NewProductionEncoderConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	//Log, err = cfg.Build()
+	//log, err = cfg.Build()
 	if err != nil {
-		log.Fatal("init Log error: ", err)
+		Log.Fatal("init log error: ", err)
 	}
 	return cfg
 }
@@ -77,19 +76,19 @@ func initRollingLog(file string) io.Writer {
 	var rollingConfig rollingwriter.Config
 	f, err := os.Open(file)
 	if err != nil {
-		log.Fatal("read log config file failed!")
+		Log.Fatal("read log config file failed!")
 	}
 	defer f.Close()
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
-		log.Fatal("read log config file failed!")
+		Log.Fatal("read log config file failed!")
 	}
 	if err := json.Unmarshal(b, &rollingConfig); err != nil {
 		panic(err)
 	}
 	writer, err := rollingwriter.NewWriterFromConfig(&rollingConfig)
 	if err != nil {
-		log.Fatal("read rolling config file failed!")
+		Log.Fatal("read rolling config file failed!")
 	}
 
 	return writer
